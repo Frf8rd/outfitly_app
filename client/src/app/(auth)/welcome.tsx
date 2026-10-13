@@ -20,7 +20,7 @@ export default function WelcomeScreen() {
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.skipRow}>
-          <Pressable accessibilityRole="button" hitSlop={12} onPress={() => router.push("/login")}>
+          <Pressable accessibilityRole="button" hitSlop={12} onPress={() => router.replace("/(tabs)")}>
             <Text variant="labelLarge" style={styles.skip}>Skip</Text>
           </Pressable>
         </View>

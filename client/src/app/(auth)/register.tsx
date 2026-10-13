@@ -44,7 +44,7 @@ export default function RegisterScreen() {
     setFormError(null);
     try {
       await register(values.name.trim(), values.email.trim().toLowerCase(), values.password);
-      router.replace("/(tabs)"); // TODO: după register → style-quiz (o singură dată)
+      router.replace("/style-quiz"); // testul de stil, apoi tab-urile
     } catch (e) {
       setFormError(authErrorMessage(e));
     } finally {

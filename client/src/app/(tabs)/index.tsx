@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 import { Text } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/constants/theme";
@@ -29,6 +30,7 @@ const SUGGESTION: OutfitSuggestion = {
 // ------------------------------------------------------------------------------------
 
 export default function HomeScreen() {
+  const router = useRouter();
   const [occasion, setOccasion] = useState<Occasion>("EVERYDAY");
   const [isFavorite, setIsFavorite] = useState(SUGGESTION.isFavorite);
 
@@ -80,7 +82,7 @@ export default function HomeScreen() {
             </Text>
             <Pressable
               accessibilityRole="link"
-              onPress={() => console.log("TODO: Vezi sugestia")}
+              onPress={() => router.push("/today")}
               style={styles.linkRow}
             >
               <Text variant="labelLarge" style={styles.link}>
@@ -96,12 +98,12 @@ export default function HomeScreen() {
             onToggleFavorite={() => setIsFavorite((v) => !v)}
           />
 
-          <AppButton label="Vezi ținuta" onPress={() => console.log("TODO: Vezi ținuta")} />
+          <AppButton label="Vezi ținuta" onPress={() => router.push("/today")} />
           <AppButton
             label="Surprinde-mă!"
             variant="outline"
             icon="sparkles-outline"
-            onPress={() => console.log("TODO: Surprinde-mă")}
+            onPress={() => router.push("/surprise")}
           />
         </View>
       </ScrollView>
