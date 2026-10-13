@@ -1,26 +1,32 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { FlatList, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "react-native-paper";
+import { Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { colors, radius } from "@/constants/theme";
-import { MOCK_OUTFITS } from "@/constants/mock";
 import { OCCASIONS } from "@/components/home/OccasionPicker";
 import OutfitCard from "@/components/outfit/OutfitCard";
+import ErrorState, { errorMessage } from "@/components/ui/ErrorState";
+import Loading from "@/components/ui/Loading";
+import { useOutfits, useUpdateOutfit } from "@/hooks/useOutfits";
+import { toSaved } from "@/services/outfits";
 import type { Occasion } from "@/types/models";
 
 
 export default function Outfits() {
   const router = useRouter();
-  const [outfits, setOutfits] = useState(MOCK_OUTFITS); // TODO: GET /outfits
+  const { data, isPending, error, refetch } = useOutfits();
+  const update = useUpdateOutfit();
+  const outfits = useMemo(() => (data ?? []).map(toSaved), [data]);
   const [occasion, setOccasion] = useState<Occasion | "ALL">("ALL");
 
-  const data = occasion === "ALL" ? outfits : outfits.filter((o) => o.occasion === occasion);
+  const shown = occasion === "ALL" ? outfits : outfits.filter((o) => o.occasion === occasion);
   const filters = [{ value: "ALL" as const, label: "Toate" }, ...OCCASIONS];
 
-  const toggleFavorite = (id: string) =>
-    setOutfits((list) => list.map((o) => (o.id === id ? { ...o, isFavorite: !o.isFavorite } : o))); // TODO: PATCH /outfits/:id
+  const toggleFavorite = (id: string, isFavorite: boolean) =>
+    update.mutate({ id, isFavorite: !isFavorite }, { onError: (e) => Alert.alert("Eroare", errorMessage(e)) });
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
@@ -58,8 +64,13 @@ export default function Outfits() {
         </ScrollView>
       </View>
 
+      {isPending ? (
+        <Loading />
+      ) : error && !data ? (
+        <ErrorState error={error} onRetry={() => refetch()} />
+      ) : (
       <FlatList
-        data={data}
+        data={shown}
         keyExtractor={(o) => o.id}
         numColumns={2}
         columnWrapperStyle={styles.row}
@@ -69,7 +80,7 @@ export default function Outfits() {
           <OutfitCard
             outfit={item}
             onPress={() => router.push(`/outfit/${item.id}`)}
-            onToggleFavorite={() => toggleFavorite(item.id)}
+            onToggleFavorite={() => toggleFavorite(item.id, item.isFavorite)}
           />
         )}
         ListEmptyComponent={
@@ -84,6 +95,7 @@ export default function Outfits() {
           </View>
         }
       />
+      )}
     </SafeAreaView>
   );
 }

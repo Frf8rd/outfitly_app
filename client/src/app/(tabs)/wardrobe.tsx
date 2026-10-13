@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Alert, FlatList, Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -8,25 +8,20 @@ import { Ionicons } from "@expo/vector-icons";
 import { colors, radius } from "@/constants/theme";
 import AppButton from "@/components/ui/AppButton";
 import CategoryChips, { CATEGORY_EMOJI, CategoryFilter } from "@/components/wardrobe/CategoryChips";
+import ErrorState, { errorMessage } from "@/components/ui/ErrorState";
+import Loading from "@/components/ui/Loading";
+import { useRemoveFromWardrobe, useWardrobe } from "@/hooks/useWardrobe";
+import { toPiece } from "@/services/wardrobe";
 import type { OutfitPiece } from "@/types/models";
-
-// ---- DATE MOCK: se înlocuiesc cu useWardrobe() (GET /wardrobe) ----
-const MOCK: OutfitPiece[] = [
-  { id: "1", name: "Tricou alb", category: "TOP" },
-  { id: "2", name: "Blugi", category: "BOTTOM" },
-  { id: "3", name: "Pulover bej", category: "TOP" },
-  { id: "4", name: "Fustă neagră", category: "BOTTOM" },
-  { id: "5", name: "Jachetă denim", category: "OUTERWEAR" },
-  { id: "6", name: "Sneakers", category: "SHOES" },
-];
-// --------------------------------------------------------------------
 
 export default function Wardrobe() {
   const router = useRouter();
-  const [items, setItems] = useState(MOCK);
+  const { data, isPending, error, refetch } = useWardrobe();
+  const remove = useRemoveFromWardrobe();
+  const items = useMemo(() => (data ?? []).map(toPiece), [data]);
   const [filter, setFilter] = useState<CategoryFilter>("ALL");
 
-  const data = filter === "ALL" ? items : items.filter((i) => i.category === filter);
+  const shown = filter === "ALL" ? items : items.filter((i) => i.category === filter);
   const goToCatalog = () => router.push("/catalog");
 
   const confirmRemove = (item: OutfitPiece) =>
@@ -35,7 +30,7 @@ export default function Wardrobe() {
       {
         text: "Scoate",
         style: "destructive",
-        onPress: () => setItems((list) => list.filter((i) => i.id !== item.id)), // TODO: DELETE /wardrobe/:id
+        onPress: () => remove.mutate(item.id, { onError: (e) => Alert.alert("Eroare", errorMessage(e)) }),
       },
     ]);
 
@@ -48,8 +43,13 @@ export default function Wardrobe() {
 
       <CategoryChips value={filter} onChange={setFilter} />
 
+      {isPending ? (
+        <Loading />
+      ) : error && !data ? (
+        <ErrorState error={error} onRetry={() => refetch()} />
+      ) : (
       <FlatList
-        data={data}
+        data={shown}
         keyExtractor={(i) => i.id}
         numColumns={2}
         columnWrapperStyle={styles.row}
@@ -89,6 +89,7 @@ export default function Wardrobe() {
           </View>
         }
       />
+      )}
 
       <View style={styles.footer}>
         <AppButton label="Adaugă haine din catalog" icon="add" onPress={goToCatalog} />

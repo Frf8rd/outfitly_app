@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, FlatList, Pressable, StyleSheet, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "react-native-paper";
@@ -8,22 +8,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { colors, radius } from "@/constants/theme";
 import AppButton from "@/components/ui/AppButton";
 import CategoryChips, { CATEGORY_EMOJI, CategoryFilter } from "@/components/wardrobe/CategoryChips";
-import type { OutfitPiece } from "@/types/models";
-
-type CatalogItem = OutfitPiece & { owned: boolean };
-
-// ---- DATE MOCK: se înlocuiesc cu useCatalog() (GET /catalog) ----
-const MOCK: CatalogItem[] = [
-  { id: "1", name: "Tricou alb", category: "TOP", owned: true },
-  { id: "2", name: "Blugi largi", category: "BOTTOM", owned: true },
-  { id: "3", name: "Rochie florală", category: "DRESS", owned: false },
-  { id: "4", name: "Jachetă denim", category: "OUTERWEAR", owned: false },
-  { id: "5", name: "Pulover verde", category: "TOP", owned: false },
-  { id: "6", name: "Fustă neagră", category: "BOTTOM", owned: false },
-  { id: "7", name: "Sneakers albi", category: "SHOES", owned: false },
-  { id: "8", name: "Geantă bej", category: "ACCESSORY", owned: false },
-];
-// ------------------------------------------------------------------
+import ErrorState from "@/components/ui/ErrorState";
+import Loading from "@/components/ui/Loading";
+import { useCatalog } from "@/hooks/useCatalog";
+import { useAddToWardrobe } from "@/hooks/useWardrobe";
+import { errorMessage } from "@/components/ui/ErrorState";
 
 export default function Catalog() {
   const router = useRouter();
@@ -31,18 +20,31 @@ export default function Catalog() {
   const [filter, setFilter] = useState<CategoryFilter>("ALL");
   const [selected, setSelected] = useState<string[]>([]);
 
-  const q = query.trim().toLowerCase();
-  const data = MOCK.filter(
-    (i) => (filter === "ALL" || i.category === filter) && (!q || i.name.toLowerCase().includes(q))
-  );
+  // căutarea pleacă la server după o scurtă pauză în scris
+  const [search, setSearch] = useState("");
+  useEffect(() => {
+    const t = setTimeout(() => setSearch(query.trim()), 300);
+    return () => clearTimeout(t);
+  }, [query]);
+
+  const { data: page, isPending, error, refetch } = useCatalog({
+    category: filter === "ALL" ? undefined : filter,
+    search,
+  });
+  const add = useAddToWardrobe();
+  const data = page?.items ?? [];
 
   const toggle = (id: string) =>
     setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
 
   function addSelected() {
-    // TODO: POST /wardrobe/bulk { catalogItemIds: selected }
-    Alert.alert("Adăugat", `${selected.length} articole au fost adăugate în garderobă.`);
-    router.back();
+    add.mutate(selected, {
+      onSuccess: () => {
+        Alert.alert("Adăugat", `${selected.length} articole au fost adăugate în garderobă.`);
+        router.back();
+      },
+      onError: (e) => Alert.alert("Eroare", errorMessage(e)),
+    });
   }
 
   return (
@@ -74,6 +76,11 @@ export default function Catalog() {
 
       <CategoryChips value={filter} onChange={setFilter} />
 
+      {isPending ? (
+        <Loading />
+      ) : error && !page ? (
+        <ErrorState error={error} onRetry={() => refetch()} />
+      ) : (
       <FlatList
         data={data}
         keyExtractor={(i) => i.id}
@@ -84,7 +91,7 @@ export default function Catalog() {
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => {
           const isSelected = selected.includes(item.id);
-          const source = item.image ?? (item.imageUrl ? { uri: item.imageUrl } : undefined);
+          const source = item.imageUrl ? { uri: item.imageUrl } : undefined;
           return (
             <Pressable
               disabled={item.owned}
@@ -117,12 +124,14 @@ export default function Catalog() {
           </View>
         }
       />
+      )}
 
       <View style={styles.footer}>
         <AppButton
           label={selected.length ? `Adaugă ${selected.length} în garderobă` : "Alege articole"}
           icon="add"
           disabled={selected.length === 0}
+          loading={add.isPending}
           onPress={addSelected}
         />
       </View>

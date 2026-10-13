@@ -1,13 +1,17 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "react-native-paper";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { colors, radius } from "@/constants/theme";
-import { MOCK_OUTFITS } from "@/constants/mock";
 import AppButton from "@/components/ui/AppButton";
 import ScreenHeader from "@/components/ui/ScreenHeader";
 import OutfitPreview from "@/components/outfit/OutfitPreview";
+import ErrorState, { errorMessage } from "@/components/ui/ErrorState";
+import Loading from "@/components/ui/Loading";
+import { useDeleteOutfit, useOutfit, useUpdateOutfit, useWearOutfit } from "@/hooks/useOutfits";
+import { ApiError } from "@/services/api";
+import { toSaved } from "@/services/outfits";
 import { OCCASIONS } from "@/components/home/OccasionPicker";
 import { CATEGORY_EMOJI, CATEGORY_FILTERS } from "@/components/wardrobe/CategoryChips";
 
@@ -15,9 +19,30 @@ export default function OutfitDetails() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  // TODO: GET /outfits/:id
-  const [outfit, setOutfit] = useState(() => MOCK_OUTFITS.find((o) => o.id === id));
+  const { data, isPending, error, refetch } = useOutfit(id);
+  const update = useUpdateOutfit();
+  const del = useDeleteOutfit();
+  const wear = useWearOutfit();
+  const outfit = useMemo(() => (data ? toSaved(data) : undefined), [data]);
   const [worn, setWorn] = useState(false);
+
+  if (isPending) {
+    return (
+      <SafeAreaView style={styles.safe}>
+        <ScreenHeader title="Ținută" />
+        <Loading />
+      </SafeAreaView>
+    );
+  }
+
+  if (error && !(error instanceof ApiError && error.status === 404)) {
+    return (
+      <SafeAreaView style={styles.safe}>
+        <ScreenHeader title="Ținută" />
+        <ErrorState error={error} onRetry={() => refetch()} />
+      </SafeAreaView>
+    );
+  }
 
   if (!outfit) {
     return (
@@ -40,10 +65,11 @@ export default function OutfitDetails() {
       {
         text: "Șterge",
         style: "destructive",
-        onPress: () => {
-          // TODO: DELETE /outfits/:id
-          router.back();
-        },
+        onPress: () =>
+          del.mutate(id, {
+            onSuccess: () => router.back(),
+            onError: (e) => Alert.alert("Eroare", errorMessage(e)),
+          }),
       },
     ]);
   }
@@ -55,7 +81,9 @@ export default function OutfitDetails() {
         <OutfitPreview
           items={outfit.items}
           isFavorite={outfit.isFavorite}
-          onToggleFavorite={() => setOutfit({ ...outfit, isFavorite: !outfit.isFavorite })} // TODO: PATCH /outfits/:id
+          onToggleFavorite={() =>
+            update.mutate({ id, isFavorite: !outfit.isFavorite }, { onError: (e) => Alert.alert("Eroare", errorMessage(e)) })
+          }
         />
 
         <Text variant="bodyMedium" style={styles.muted}>Ocazie: {occasion}</Text>
@@ -76,9 +104,10 @@ export default function OutfitDetails() {
           label={worn ? "Marcată ca purtată azi" : "Am purtat-o azi"}
           icon={worn ? "checkmark" : "shirt-outline"}
           disabled={worn}
-          onPress={() => setWorn(true)} // TODO: POST /outfits/:id/wear
+          loading={wear.isPending}
+          onPress={() => wear.mutate(id, { onSuccess: () => setWorn(true), onError: (e) => Alert.alert("Eroare", errorMessage(e)) })}
         />
-        <AppButton label="Editează" variant="outline" icon="create-outline" onPress={() => router.push("/outfit/create")} />
+        <AppButton label="Editează" variant="outline" icon="create-outline" onPress={() => router.push({ pathname: "/outfit/create", params: { id } })} />
         <AppButton label="Șterge ținuta" variant="outline" style={styles.danger} onPress={confirmDelete} />
       </ScrollView>
     </SafeAreaView>

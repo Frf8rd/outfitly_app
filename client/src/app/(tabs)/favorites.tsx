@@ -1,19 +1,25 @@
-import { useState } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import { useMemo } from "react";
+import { Alert, FlatList, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "react-native-paper";
 import { useRouter } from "expo-router";
 import { colors } from "@/constants/theme";
-import { MOCK_OUTFITS } from "@/constants/mock";
 import OutfitCard from "@/components/outfit/OutfitCard";
+import ErrorState, { errorMessage } from "@/components/ui/ErrorState";
+import Loading from "@/components/ui/Loading";
+import { useOutfits, useUpdateOutfit } from "@/hooks/useOutfits";
+import { toSaved } from "@/services/outfits";
 
 
 export default function Favorites() {
   const router = useRouter();
-  const [outfits, setOutfits] = useState(MOCK_OUTFITS.filter((o) => o.isFavorite)); // TODO: GET /outfits?favorite=true
+  const { data, isPending, error, refetch } = useOutfits({ favorite: true });
+  const update = useUpdateOutfit();
+  const outfits = useMemo(() => (data ?? []).map(toSaved), [data]);
 
   // Apăsând pe inimă, ținuta iese din favorite (și din listă).
-  const removeFavorite = (id: string) => setOutfits((list) => list.filter((o) => o.id !== id)); // TODO: PATCH /outfits/:id
+  const removeFavorite = (id: string) =>
+    update.mutate({ id, isFavorite: false }, { onError: (e) => Alert.alert("Eroare", errorMessage(e)) });
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
@@ -22,6 +28,11 @@ export default function Favorites() {
         <Text variant="bodyMedium" style={styles.muted}>{outfits.length} ținute preferate</Text>
       </View>
 
+      {isPending ? (
+        <Loading />
+      ) : error && !data ? (
+        <ErrorState error={error} onRetry={() => refetch()} />
+      ) : (
       <FlatList
         data={outfits}
         keyExtractor={(o) => o.id}
@@ -46,6 +57,7 @@ export default function Favorites() {
           </View>
         }
       />
+      )}
     </SafeAreaView>
   );
 }

@@ -12,37 +12,37 @@ export type SavedOutfit = OutfitSuggestion & { id: string };
 type Props = { outfit: SavedOutfit; onPress?: () => void; onToggleFavorite?: () => void };
 
 // Card mic de ținută (colaj 2x2 + nume + ocazie + ❤️), folosit în Ținute și Favorite.
-// Inima nu e în interiorul cardului-buton (pe web <button> în <button> e invalid): sunt frați, inima stă peste card.
 export default function OutfitCard({ outfit, onPress, onToggleFavorite }: Props) {
   const occasion = OCCASIONS.find((o) => o.value === outfit.occasion)?.label ?? "";
 
   return (
+    // Inima NU e în interiorul cardului-buton (pe web <button> în <button> e invalid): sunt frați, inima stă peste card.
     <View style={styles.card}>
-      <Pressable
-        onPress={onPress}
-        accessibilityRole="button"
-        accessibilityLabel={`${outfit.name}, ${occasion}`}
-        style={styles.body}
-      >
-        <View style={styles.preview}>
-          {outfit.items.slice(0, 4).map((item) => {
-            const source = item.image ?? (item.imageUrl ? { uri: item.imageUrl } : undefined);
-            return (
-              <View key={item.id} style={styles.tile}>
-                {source ? (
-                  <Image source={source} style={styles.image} contentFit="contain" />
-                ) : (
-                  <Text style={styles.emoji}>{CATEGORY_EMOJI[item.category]}</Text>
-                )}
-              </View>
-            );
-          })}
-        </View>
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`${outfit.name}, ${occasion}`}
+      style={styles.body}
+    >
+      <View style={styles.preview}>
+        {outfit.items.slice(0, 4).map((item) => {
+          const source = item.image ?? (item.imageUrl ? { uri: item.imageUrl } : undefined);
+          return (
+            <View key={item.id} style={styles.tile}>
+              {source ? (
+                <Image source={source} style={styles.image} contentFit="contain" />
+              ) : (
+                <Text style={styles.emoji}>{CATEGORY_EMOJI[item.category]}</Text>
+              )}
+            </View>
+          );
+        })}
 
-        <Text variant="labelLarge" style={styles.name} numberOfLines={1}>{outfit.name}</Text>
-        <Text variant="bodySmall" style={styles.muted}>{occasion}</Text>
-      </Pressable>
+      </View>
 
+      <Text variant="labelLarge" style={styles.name} numberOfLines={1}>{outfit.name}</Text>
+      <Text variant="bodySmall" style={styles.muted}>{occasion}</Text>
+    </Pressable>
       <Pressable
         hitSlop={10}
         onPress={onToggleFavorite}
