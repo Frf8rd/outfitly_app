@@ -11,7 +11,7 @@
   ],
   "warmth": 1,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/tricou-alb.png"
  },
  {
   "name": "Tricou negru",
@@ -24,7 +24,7 @@
   ],
   "warmth": 1,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/tricou-negru.png"
  },
  {
   "name": "Tricou roz",
@@ -37,32 +37,19 @@
   ],
   "warmth": 1,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/tricou-roz.png"
  },
  {
-  "name": "Maiou sport",
+  "name": "Tricou sport gri",
   "category": "TOP",
-  "subtype": "maiou",
+  "subtype": "tricou",
   "color": "gri",
   "styles": [
    "SPORT"
   ],
   "warmth": 1,
   "waterproof": false,
-  "imageUrl": ""
- },
- {
-  "name": "Bluză albă cu volane",
-  "category": "TOP",
-  "subtype": "bluză",
-  "color": "alb",
-  "styles": [
-   "ELEGANT",
-   "COQUETTE"
-  ],
-  "warmth": 2,
-  "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/tricou-sport-gri.png"
  },
  {
   "name": "Cămașă albă",
@@ -75,7 +62,7 @@
   ],
   "warmth": 2,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/camasa-alba.png"
  },
  {
   "name": "Cămașă în carouri",
@@ -88,46 +75,45 @@
   ],
   "warmth": 2,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/camasa-in-carouri.png"
  },
  {
-  "name": "Top negru elegant",
+  "name": "Bluză satinată elegantă",
   "category": "TOP",
-  "subtype": "top",
-  "color": "negru",
+  "subtype": "bluză",
+  "color": "crem",
   "styles": [
    "ELEGANT"
   ],
   "warmth": 1,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/bluza-satinata-eleganta.png"
  },
  {
-  "name": "Hanorac gri",
+  "name": "Top scurt negru",
   "category": "TOP",
-  "subtype": "hanorac",
-  "color": "gri",
-  "styles": [
-   "CASUAL",
-   "SPORT",
-   "STREETWEAR"
-  ],
-  "warmth": 4,
-  "waterproof": false,
-  "imageUrl": ""
- },
- {
-  "name": "Hanorac negru",
-  "category": "TOP",
-  "subtype": "hanorac",
+  "subtype": "top",
   "color": "negru",
   "styles": [
-   "STREETWEAR",
-   "CASUAL"
+   "CASUAL",
+   "STREETWEAR"
   ],
-  "warmth": 4,
+  "warmth": 1,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/top-scurt-negru.png"
+ },
+ {
+  "name": "Bluză cu dantelă",
+  "category": "TOP",
+  "subtype": "bluză",
+  "color": "alb",
+  "styles": [
+   "COQUETTE",
+   "ELEGANT"
+  ],
+  "warmth": 1,
+  "waterproof": false,
+  "imageUrl": "/catalog/bluza-cu-dantela.png"
  },
  {
   "name": "Pulover verde",
@@ -154,33 +140,46 @@
   ],
   "warmth": 4,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/pulover-bej.png"
  },
  {
-  "name": "Pulover roz",
+  "name": "Pulover gros de iarnă",
   "category": "TOP",
   "subtype": "pulover",
-  "color": "roz",
+  "color": "gri",
+  "styles": [
+   "CASUAL"
+  ],
+  "warmth": 5,
+  "waterproof": false,
+  "imageUrl": "/catalog/pulover-gros-de-iarna.png"
+ },
+ {
+  "name": "Hanorac gri",
+  "category": "TOP",
+  "subtype": "hanorac",
+  "color": "gri",
   "styles": [
    "CASUAL",
-   "COQUETTE"
+   "SPORT",
+   "STREETWEAR"
   ],
   "warmth": 4,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/hanorac-gri.png"
  },
  {
-  "name": "Cardigan lavandă",
+  "name": "Hanorac negru oversized",
   "category": "TOP",
-  "subtype": "cardigan",
-  "color": "lavandă",
+  "subtype": "hanorac",
+  "color": "negru",
   "styles": [
-   "COQUETTE",
-   "ELEGANT"
+   "STREETWEAR",
+   "CASUAL"
   ],
-  "warmth": 3,
+  "warmth": 4,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/hanorac-negru-oversized.png"
  },
  {
   "name": "Blugi albaștri",
@@ -193,7 +192,7 @@
   ],
   "warmth": 3,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/blugi-albastri.png"
  },
  {
   "name": "Blugi negri",
@@ -207,7 +206,7 @@
   ],
   "warmth": 3,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/blugi-negri.png"
  },
  {
   "name": "Blugi largi",
@@ -220,7 +219,7 @@
   ],
   "warmth": 3,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/blugi-largi.png"
  },
  {
   "name": "Pantaloni crem",
@@ -245,10 +244,10 @@
   ],
   "warmth": 3,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/pantaloni-eleganti-negri.png"
  },
  {
-  "name": "Pantaloni de trening",
+  "name": "Pantaloni de trening gri",
   "category": "BOTTOM",
   "subtype": "trening",
   "color": "gri",
@@ -258,22 +257,10 @@
   ],
   "warmth": 3,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/pantaloni-de-trening-gri.png"
  },
  {
-  "name": "Pantaloni scurți sport",
-  "category": "BOTTOM",
-  "subtype": "pantaloni scurți",
-  "color": "negru",
-  "styles": [
-   "SPORT"
-  ],
-  "warmth": 1,
-  "waterproof": false,
-  "imageUrl": ""
- },
- {
-  "name": "Pantaloni scurți denim",
+  "name": "Pantaloni scurți din denim",
   "category": "BOTTOM",
   "subtype": "pantaloni scurți",
   "color": "albastru",
@@ -282,7 +269,7 @@
   ],
   "warmth": 1,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/pantaloni-scurti-din-denim.png"
  },
  {
   "name": "Fustă neagră",
@@ -296,32 +283,33 @@
   ],
   "warmth": 2,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/fusta-neagra.png"
  },
  {
-  "name": "Fustă plisată roz",
+  "name": "Fustă plisată",
+  "category": "BOTTOM",
+  "subtype": "fustă",
+  "color": "bej",
+  "styles": [
+   "COQUETTE",
+   "ELEGANT"
+  ],
+  "warmth": 2,
+  "waterproof": false,
+  "imageUrl": "/catalog/fusta-plisata.png"
+ },
+ {
+  "name": "Fustă mini roz",
   "category": "BOTTOM",
   "subtype": "fustă",
   "color": "roz",
   "styles": [
-   "COQUETTE"
+   "COQUETTE",
+   "CASUAL"
   ],
-  "warmth": 2,
+  "warmth": 1,
   "waterproof": false,
-  "imageUrl": ""
- },
- {
-  "name": "Fustă denim",
-  "category": "BOTTOM",
-  "subtype": "fustă",
-  "color": "albastru",
-  "styles": [
-   "CASUAL",
-   "STREETWEAR"
-  ],
-  "warmth": 2,
-  "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/fusta-mini-roz.png"
  },
  {
   "name": "Rochie florală",
@@ -334,10 +322,10 @@
   ],
   "warmth": 1,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/rochie-florala.png"
  },
  {
-  "name": "Rochie neagră mini",
+  "name": "Rochie neagră elegantă",
   "category": "DRESS",
   "subtype": "rochie",
   "color": "negru",
@@ -346,20 +334,7 @@
   ],
   "warmth": 1,
   "waterproof": false,
-  "imageUrl": ""
- },
- {
-  "name": "Rochie lungă lavandă",
-  "category": "DRESS",
-  "subtype": "rochie",
-  "color": "lavandă",
-  "styles": [
-   "ELEGANT",
-   "COQUETTE"
-  ],
-  "warmth": 2,
-  "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/rochie-neagra-eleganta.png"
  },
  {
   "name": "Rochie albă de vară",
@@ -372,20 +347,44 @@
   ],
   "warmth": 1,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/rochie-alba-de-vara.png"
  },
  {
-  "name": "Rochie midi verde",
+  "name": "Rochie roz",
   "category": "DRESS",
   "subtype": "rochie",
-  "color": "verde",
+  "color": "roz",
   "styles": [
-   "ELEGANT",
-   "CASUAL"
+   "COQUETTE"
+  ],
+  "warmth": 1,
+  "waterproof": false,
+  "imageUrl": "/catalog/rochie-roz.png"
+ },
+ {
+  "name": "Rochie casual tip tricou",
+  "category": "DRESS",
+  "subtype": "rochie",
+  "color": "gri",
+  "styles": [
+   "CASUAL",
+   "SPORT"
+  ],
+  "warmth": 1,
+  "waterproof": false,
+  "imageUrl": "/catalog/rochie-casual-tip-tricou.png"
+ },
+ {
+  "name": "Rochie lungă de seară",
+  "category": "DRESS",
+  "subtype": "rochie",
+  "color": "bordo",
+  "styles": [
+   "ELEGANT"
   ],
   "warmth": 2,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/rochie-lunga-de-seara.png"
  },
  {
   "name": "Jachetă denim",
@@ -398,7 +397,7 @@
   ],
   "warmth": 3,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/jacheta-denim.png"
  },
  {
   "name": "Geacă de piele neagră",
@@ -411,59 +410,21 @@
   ],
   "warmth": 3,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/geaca-de-piele-neagra.png"
  },
  {
-  "name": "Trench bej",
+  "name": "Cardigan bej",
   "category": "OUTERWEAR",
-  "subtype": "trench",
+  "subtype": "cardigan",
   "color": "bej",
   "styles": [
+   "CASUAL",
    "ELEGANT",
-   "CASUAL"
+   "COQUETTE"
   ],
   "warmth": 3,
-  "waterproof": true,
-  "imageUrl": ""
- },
- {
-  "name": "Geacă de ploaie galbenă",
-  "category": "OUTERWEAR",
-  "subtype": "geacă",
-  "color": "galben",
-  "styles": [
-   "CASUAL",
-   "SPORT"
-  ],
-  "warmth": 3,
-  "waterproof": true,
-  "imageUrl": ""
- },
- {
-  "name": "Geacă groasă de iarnă",
-  "category": "OUTERWEAR",
-  "subtype": "geacă",
-  "color": "negru",
-  "styles": [
-   "CASUAL",
-   "SPORT",
-   "STREETWEAR"
-  ],
-  "warmth": 5,
-  "waterproof": true,
-  "imageUrl": ""
- },
- {
-  "name": "Palton elegant gri",
-  "category": "OUTERWEAR",
-  "subtype": "palton",
-  "color": "gri",
-  "styles": [
-   "ELEGANT"
-  ],
-  "warmth": 5,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/cardigan-bej.png"
  },
  {
   "name": "Blazer negru",
@@ -475,10 +436,10 @@
   ],
   "warmth": 2,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/blazer-negru.png"
  },
  {
-  "name": "Bomber verde",
+  "name": "Geacă bomber",
   "category": "OUTERWEAR",
   "subtype": "bomber",
   "color": "verde",
@@ -488,7 +449,46 @@
   ],
   "warmth": 3,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/geaca-bomber.png"
+ },
+ {
+  "name": "Parka groasă",
+  "category": "OUTERWEAR",
+  "subtype": "parka",
+  "color": "verde",
+  "styles": [
+   "CASUAL",
+   "STREETWEAR",
+   "SPORT"
+  ],
+  "warmth": 5,
+  "waterproof": true,
+  "imageUrl": "/catalog/parka-groasa.png"
+ },
+ {
+  "name": "Palton lung",
+  "category": "OUTERWEAR",
+  "subtype": "palton",
+  "color": "gri",
+  "styles": [
+   "ELEGANT"
+  ],
+  "warmth": 5,
+  "waterproof": false,
+  "imageUrl": "/catalog/palton-lung.png"
+ },
+ {
+  "name": "Impermeabil galben",
+  "category": "OUTERWEAR",
+  "subtype": "impermeabil",
+  "color": "galben",
+  "styles": [
+   "CASUAL",
+   "SPORT"
+  ],
+  "warmth": 3,
+  "waterproof": true,
+  "imageUrl": "/catalog/impermeabil-galben.png"
  },
  {
   "name": "Sneakers albi",
@@ -499,19 +499,6 @@
    "CASUAL",
    "STREETWEAR",
    "SPORT"
-  ],
-  "warmth": 2,
-  "waterproof": false,
-  "imageUrl": ""
- },
- {
-  "name": "Adidași sport",
-  "category": "SHOES",
-  "subtype": "adidași",
-  "color": "alb",
-  "styles": [
-   "SPORT",
-   "CASUAL"
   ],
   "warmth": 2,
   "waterproof": false,
@@ -528,37 +515,12 @@
   ],
   "warmth": 2,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/sneakers-negri.png"
  },
  {
-  "name": "Balerini roz",
+  "name": "Ghete negre",
   "category": "SHOES",
-  "subtype": "balerini",
-  "color": "roz",
-  "styles": [
-   "COQUETTE",
-   "ELEGANT"
-  ],
-  "warmth": 1,
-  "waterproof": false,
-  "imageUrl": ""
- },
- {
-  "name": "Pantofi eleganți negri",
-  "category": "SHOES",
-  "subtype": "pantofi",
-  "color": "negru",
-  "styles": [
-   "ELEGANT"
-  ],
-  "warmth": 2,
-  "waterproof": false,
-  "imageUrl": ""
- },
- {
-  "name": "Cizme negre",
-  "category": "SHOES",
-  "subtype": "cizme",
+  "subtype": "ghete",
   "color": "negru",
   "styles": [
    "STREETWEAR",
@@ -566,23 +528,24 @@
    "CASUAL"
   ],
   "warmth": 4,
-  "waterproof": true,
-  "imageUrl": ""
+  "waterproof": false,
+  "imageUrl": "/catalog/ghete-negre.png"
  },
  {
-  "name": "Cizme de cauciuc",
+  "name": "Balerini eleganți",
   "category": "SHOES",
-  "subtype": "cizme",
-  "color": "galben",
+  "subtype": "balerini",
+  "color": "negru",
   "styles": [
-   "CASUAL"
+   "ELEGANT",
+   "COQUETTE"
   ],
-  "warmth": 3,
-  "waterproof": true,
-  "imageUrl": ""
+  "warmth": 1,
+  "waterproof": false,
+  "imageUrl": "/catalog/balerini-eleganti.png"
  },
  {
-  "name": "Sandale bej",
+  "name": "Sandale",
   "category": "SHOES",
   "subtype": "sandale",
   "color": "bej",
@@ -592,7 +555,20 @@
   ],
   "warmth": 1,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/sandale.png"
+ },
+ {
+  "name": "Ghete impermeabile",
+  "category": "SHOES",
+  "subtype": "ghete",
+  "color": "negru",
+  "styles": [
+   "CASUAL",
+   "STREETWEAR"
+  ],
+  "warmth": 4,
+  "waterproof": true,
+  "imageUrl": "/catalog/ghete-impermeabile.png"
  },
  {
   "name": "Geantă bej",
@@ -606,50 +582,23 @@
   ],
   "warmth": 1,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/geanta-bej.png"
  },
  {
-  "name": "Rucsac negru",
+  "name": "Curea neagră",
   "category": "ACCESSORY",
-  "subtype": "rucsac",
+  "subtype": "curea",
   "color": "negru",
-  "styles": [
-   "CASUAL",
-   "SPORT",
-   "STREETWEAR"
-  ],
-  "warmth": 1,
-  "waterproof": false,
-  "imageUrl": ""
- },
- {
-  "name": "Fular gri",
-  "category": "ACCESSORY",
-  "subtype": "fular",
-  "color": "gri",
   "styles": [
    "CASUAL",
    "ELEGANT"
   ],
-  "warmth": 4,
+  "warmth": 1,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/curea-neagra.png"
  },
  {
-  "name": "Căciulă neagră",
-  "category": "ACCESSORY",
-  "subtype": "căciulă",
-  "color": "negru",
-  "styles": [
-   "CASUAL",
-   "STREETWEAR"
-  ],
-  "warmth": 4,
-  "waterproof": false,
-  "imageUrl": ""
- },
- {
-  "name": "Șapcă albă",
+  "name": "Șapcă",
   "category": "ACCESSORY",
   "subtype": "șapcă",
   "color": "alb",
@@ -660,32 +609,19 @@
   ],
   "warmth": 1,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/sapca.png"
  },
  {
-  "name": "Ochelari de soare",
-  "category": "ACCESSORY",
-  "subtype": "ochelari",
-  "color": "negru",
-  "styles": [
-   "CASUAL",
-   "STREETWEAR"
-  ],
-  "warmth": 1,
-  "waterproof": false,
-  "imageUrl": ""
- },
- {
-  "name": "Eșarfă de mătase roz",
+  "name": "Eșarfă",
   "category": "ACCESSORY",
   "subtype": "eșarfă",
-  "color": "roz",
+  "color": "gri",
   "styles": [
-   "COQUETTE",
+   "CASUAL",
    "ELEGANT"
   ],
-  "warmth": 1,
+  "warmth": 3,
   "waterproof": false,
-  "imageUrl": ""
+  "imageUrl": "/catalog/esarfa.png"
  }
 ]
