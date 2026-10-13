@@ -10,10 +10,10 @@ import AppButton from "@/components/ui/AppButton";
 import WeatherCard from "@/components/home/WeatherCard";
 import OccasionPicker from "@/components/home/OccasionPicker";
 import OutfitPreview from "@/components/outfit/OutfitPreview";
+import { useAuthStore } from "@/store/auth";
 import type { Occasion, OutfitSuggestion, Weather } from "@/types/models";
 
 // ---- DATE MOCK: se înlocuiesc cu hook-uri (useAuth, useWeather, useTodayOutfit) ----
-const USER_NAME = "Andreea";
 
 const WEATHER: Weather = { temperature: 18, condition: "clear", summary: "Cer senin", city: "Chișinău" };
 
@@ -31,6 +31,7 @@ const SUGGESTION: OutfitSuggestion = {
 
 export default function HomeScreen() {
   const router = useRouter();
+  const userName = useAuthStore((s) => s.user?.name);
   const [occasion, setOccasion] = useState<Occasion>("EVERYDAY");
   const [isFavorite, setIsFavorite] = useState(SUGGESTION.isFavorite);
 
@@ -42,7 +43,7 @@ export default function HomeScreen() {
           <View style={styles.headerText}>
             <View style={styles.greetingRow}>
               <Text variant="headlineSmall" style={styles.greeting}>
-                Bună, {USER_NAME}!
+                Bună{userName ? `, ${userName}` : ""}!
               </Text>
               <Ionicons name="heart-outline" size={20} color={colors.primary} />
             </View>

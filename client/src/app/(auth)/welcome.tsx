@@ -5,6 +5,8 @@ import { useRouter } from "expo-router";
 import { colors } from "@/constants/theme";
 import { CLOTHES } from "@/constants/clothes";
 import AppButton from "@/components/ui/AppButton";
+import { MOCK_AUTH } from "@/constants/config";
+import { login } from "@/services/auth";
 import OutfitPreview from "@/components/outfit/OutfitPreview";
 
 const SHOWCASE = [
@@ -19,11 +21,14 @@ export default function WelcomeScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.skipRow}>
-          <Pressable accessibilityRole="button" hitSlop={12} onPress={() => router.replace("/(tabs)")}>
-            <Text variant="labelLarge" style={styles.skip}>Skip</Text>
-          </Pressable>
-        </View>
+        {/* „Skip" există doar în modul demo (fără server): intră cu un cont de test */}
+        {MOCK_AUTH ? (
+          <View style={styles.skipRow}>
+            <Pressable accessibilityRole="button" hitSlop={12} onPress={() => login("demo@stilora.app", "demo")}>
+              <Text variant="labelLarge" style={styles.skip}>Skip</Text>
+            </Pressable>
+          </View>
+        ) : null}
 
         <View style={styles.head}>
           <Text variant="headlineLarge" style={styles.title}>Bine ai venit la Stilora!</Text>

@@ -5,9 +5,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { Href, useRouter } from "expo-router";
 import { colors, radius } from "@/constants/theme";
 import type { ComponentProps } from "react";
+import { useAuthStore } from "@/store/auth";
 
 // ---- DATE MOCK: se înlocuiesc cu GET /auth/me și GET /stats ----
-const USER = { name: "Andreea", style: "Casual", clothes: 24, outfits: 8, unworn: 11 };
+const USER = { style: "Casual", clothes: 24, outfits: 8, unworn: 11 };
 // -----------------------------------------------------------------
 
 const STATS = [
@@ -25,15 +26,16 @@ const ROWS: { icon: ComponentProps<typeof Ionicons>["name"]; label: string; sub:
 
 export default function Profile() {
   const router = useRouter();
+  const name = useAuthStore((s) => s.user?.name) ?? "";
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.hero}>
           <View style={styles.avatar}>
-            <Text variant="headlineMedium" style={styles.avatarText}>{USER.name[0]}</Text>
+            <Text variant="headlineMedium" style={styles.avatarText}>{name[0]?.toUpperCase()}</Text>
           </View>
-          <Text variant="headlineSmall" style={styles.name}>{USER.name}</Text>
+          <Text variant="headlineSmall" style={styles.name}>{name}</Text>
           <View style={styles.styleChip}>
             <Ionicons name="sparkles-outline" size={14} color={colors.primary} />
             <Text variant="labelLarge" style={styles.styleText}>Stilul tău: {USER.style}</Text>

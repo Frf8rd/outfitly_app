@@ -2,18 +2,18 @@ import { useState } from "react";
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Switch, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "react-native-paper";
-import { useRouter } from "expo-router";
 import { colors, radius } from "@/constants/theme";
 import AppButton from "@/components/ui/AppButton";
 import ScreenHeader from "@/components/ui/ScreenHeader";
 import TextField from "@/components/ui/TextField";
-import { setAuthToken } from "@/services/api";
+import { logout as signOut } from "@/services/auth";
+import { useAuthStore } from "@/store/auth";
 import { validateName, validateNewPassword } from "@/utils/validation";
 
 export default function Settings() {
-  const router = useRouter();
+  const user = useAuthStore((s) => s.user);
 
-  const [name, setName] = useState("Andreea"); // TODO: din GET /auth/me
+  const [name, setName] = useState(user?.name ?? "");
   const [nameTouched, setNameTouched] = useState(false);
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
@@ -46,10 +46,7 @@ export default function Settings() {
       { text: "Anulează", style: "cancel" },
       {
         text: "Deconectează-mă",
-        onPress: () => {
-          setAuthToken(null);
-          router.replace("/welcome");
-        },
+        onPress: () => signOut(), // gardul de rute din _layout te duce singur la /welcome
       },
     ]);
   }
@@ -64,9 +61,8 @@ export default function Settings() {
           text: "Șterge definitiv",
           style: "destructive",
           onPress: () => {
-            // TODO: DELETE /users/me
-            setAuthToken(null);
-            router.replace("/welcome");
+            // TODO: DELETE /users/me, apoi:
+            signOut();
           },
         },
       ]

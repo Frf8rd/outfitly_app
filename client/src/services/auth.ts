@@ -1,7 +1,8 @@
 import { MOCK_AUTH } from "@/constants/config";
-import { api, ApiError, setAuthToken } from "@/services/api";
+import { api, ApiError } from "@/services/api";
+import { useAuthStore, type AuthUser } from "@/store/auth";
 
-export type AuthUser = { id: string; name: string; email: string };
+export type { AuthUser };
 export type AuthResponse = { user: AuthUser; token: string };
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -14,11 +15,12 @@ async function mockAuth(email: string, name?: string): Promise<AuthResponse> {
   };
 }
 
+// După login/register salvăm sesiunea în store (+ expo-secure-store); gardul de rute din _layout face restul.
 export async function login(email: string, password: string): Promise<AuthResponse> {
   const res = MOCK_AUTH
     ? await mockAuth(email)
     : await api<AuthResponse>("/auth/login", { method: "POST", body: { email, password } });
-  setAuthToken(res.token);
+  await useAuthStore.getState().setSession(res.user, res.token);
   return res;
 }
 
@@ -26,9 +28,11 @@ export async function register(name: string, email: string, password: string): P
   const res = MOCK_AUTH
     ? await mockAuth(email, name)
     : await api<AuthResponse>("/auth/register", { method: "POST", body: { name, email, password } });
-  setAuthToken(res.token);
+  await useAuthStore.getState().setSession(res.user, res.token);
   return res;
 }
+
+export const logout = () => useAuthStore.getState().signOut();
 
 // TODO: necesită Google Cloud (OAuth client IDs) + expo-auth-session; vezi explicațiile din chat.
 export async function signInWithGoogle(): Promise<AuthResponse> {
