@@ -10,7 +10,9 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://REPLACE-ME.onrender.com/api"
+        "EXPO_PUBLIC_API_URL": "https://stilora-api.onrender.com/api",
+        "EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID": "727024679604-7nsujnpoouo6ht3nkg09bhk5ikkta7k2.apps.googleusercontent.com",
+        "EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": "727024679604-4llceku907cgv2ghb4bbsbihftuh3avu.apps.googleusercontent.com"
       }
     },
     "production": {
@@ -19,7 +21,9 @@
         "buildType": "app-bundle"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://REPLACE-ME.onrender.com/api"
+        "EXPO_PUBLIC_API_URL": "https://stilora-api.onrender.com/api",
+        "EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID": "727024679604-7nsujnpoouo6ht3nkg09bhk5ikkta7k2.apps.googleusercontent.com",
+        "EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": "727024679604-4llceku907cgv2ghb4bbsbihftuh3avu.apps.googleusercontent.com"
       }
     }
   },
