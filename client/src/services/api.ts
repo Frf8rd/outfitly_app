@@ -42,7 +42,8 @@ type Options = { method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE"; body?: un
 
 async function request(path: string, { method = "GET", body }: Options, accessToken: string | null): Promise<Response> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 15000);
+  // Render free adoarme: prima cerere după pauză poate dura 30-60s, deci dăm mai mult timp.
+  const timer = setTimeout(() => controller.abort(), path.startsWith("/auth/") ? 60000 : 30000);
   try {
     return await fetch(`${API_URL}${path}`, {
       method,
@@ -53,7 +54,8 @@ async function request(path: string, { method = "GET", body }: Options, accessTo
       body: body === undefined ? undefined : JSON.stringify(body),
       signal: controller.signal,
     });
-  } catch {
+  } catch (e) {
+    console.warn("[api] fetch failed:", method, `${API_URL}${path}`, e);
     throw new ApiError(0, "NETWORK_ERROR", "Nu mă pot conecta la server. Verifică internetul și încearcă din nou.");
   } finally {
     clearTimeout(timer);

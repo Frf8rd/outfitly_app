@@ -7,6 +7,7 @@ import { theme } from "@/constants/theme";
 import { queryClient } from "@/services/queryClient";
 import { onNotificationTap } from "@/services/notifications";
 import { useAuthStore } from "@/store/auth";
+import { API_URL } from "@/constants/config";
 
 // Ținem splash-ul pe ecran până știm dacă există o sesiune salvată (altfel se vede un flash de login).
 SplashScreen.preventAutoHideAsync();
@@ -47,6 +48,11 @@ export default function RootLayout() {
   useEffect(() => {
     bootstrap();
   }, [bootstrap]);
+
+  // Trezește serverul (Render free adoarme) cât timp utilizatorul vede ecranul de start.
+  useEffect(() => {
+    if (API_URL) fetch(`${API_URL}/health`).catch(() => {});
+  }, []);
 
   useAuthGate();
   useNotificationTap();
