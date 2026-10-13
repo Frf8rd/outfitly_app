@@ -6,7 +6,7 @@ import { colors, radius } from "@/constants/theme";
 import AppButton from "@/components/ui/AppButton";
 import ScreenHeader from "@/components/ui/ScreenHeader";
 import TextField from "@/components/ui/TextField";
-import { logout as signOut } from "@/services/auth";
+import { authErrorMessage, changePassword, deleteAccount as removeAccount, logout as signOut, updateName } from "@/services/auth";
 import { useAuthStore } from "@/store/auth";
 import { validateName, validateNewPassword } from "@/utils/validation";
 
@@ -24,21 +24,29 @@ export default function Settings() {
   const currentError = passSubmitted && !current ? "Introdu parola actuală." : undefined;
   const nextError = passSubmitted ? validateNewPassword(next) : undefined;
 
-  function saveName() {
+  async function saveName() {
     setNameTouched(true);
     if (validateName(name)) return;
-    // TODO: PATCH /users/me { name }
-    Alert.alert("Salvat", "Numele a fost actualizat.");
+    try {
+      await updateName(name.trim());
+      Alert.alert("Salvat", "Numele a fost actualizat.");
+    } catch (e) {
+      Alert.alert("Eroare", authErrorMessage(e));
+    }
   }
 
-  function savePassword() {
+  async function savePassword() {
     setPassSubmitted(true);
     if (!current || validateNewPassword(next)) return;
-    // TODO: PATCH /users/me { currentPassword, password }
-    Alert.alert("Salvat", "Parola a fost schimbată.");
-    setCurrent("");
-    setNext("");
-    setPassSubmitted(false);
+    try {
+      await changePassword(current, next);
+      Alert.alert("Salvat", "Parola a fost schimbată.");
+      setCurrent("");
+      setNext("");
+      setPassSubmitted(false);
+    } catch (e) {
+      Alert.alert("Eroare", authErrorMessage(e));
+    }
   }
 
   function logout() {
@@ -61,8 +69,7 @@ export default function Settings() {
           text: "Șterge definitiv",
           style: "destructive",
           onPress: () => {
-            // TODO: DELETE /users/me, apoi:
-            signOut();
+            removeAccount().catch((e) => Alert.alert("Eroare", authErrorMessage(e)));
           },
         },
       ]

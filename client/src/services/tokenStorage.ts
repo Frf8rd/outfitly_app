@@ -5,7 +5,11 @@ import * as SecureStore from "expo-secure-store";
 // deci folosim localStorage doar ca să poți testa în browser.
 const KEY = "stilora.session";
 
-export type StoredSession = { token: string; user: { id: string; name: string; email: string } };
+export type StoredSession = {
+  accessToken: string;
+  refreshToken: string;
+  user: { id: string; name: string; email: string };
+};
 
 export async function saveSession(session: StoredSession): Promise<void> {
   const value = JSON.stringify(session);
@@ -22,7 +26,7 @@ export async function loadSession(): Promise<StoredSession | null> {
     const raw = Platform.OS === "web" ? localStorage.getItem(KEY) : await SecureStore.getItemAsync(KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    return parsed?.token && parsed?.user ? (parsed as StoredSession) : null;
+    return parsed?.accessToken && parsed?.refreshToken && parsed?.user ? (parsed as StoredSession) : null;
   } catch {
     return null;
   }

@@ -1,15 +1,17 @@
 import { useRef, useState } from "react";
-import { Alert, Pressable, StyleSheet, TextInput, View } from "react-native";
+import { Pressable, StyleSheet, TextInput, View } from "react-native";
 import { Text } from "react-native-paper";
 import { useRouter } from "expo-router";
 import { colors } from "@/constants/theme";
+import { ApiError } from "@/services/api";
 import AuthShell from "@/components/auth/AuthShell";
 import FormError from "@/components/auth/FormError";
 import GoogleButton from "@/components/auth/GoogleButton";
 import SocialDivider from "@/components/auth/SocialDivider";
 import AppButton from "@/components/ui/AppButton";
 import TextField from "@/components/ui/TextField";
-import { authErrorMessage, login, signInWithGoogle } from "@/services/auth";
+import { authErrorMessage, login } from "@/services/auth";
+import { useGoogleSignIn } from "@/services/google";
 import { validateEmail, validateLoginPassword } from "@/utils/validation";
 
 type Field = "email" | "password";
@@ -17,6 +19,7 @@ type Field = "email" | "password";
 export default function LoginScreen() {
   const router = useRouter();
   const passwordRef = useRef<TextInput>(null);
+  const signInWithGoogle = useGoogleSignIn();
 
   const [values, setValues] = useState({ email: "", password: "" });
   const [touched, setTouched] = useState<Partial<Record<Field, boolean>>>({});
@@ -57,7 +60,7 @@ export default function LoginScreen() {
       await signInWithGoogle();
       router.replace("/(tabs)");
     } catch (e) {
-      setFormError(authErrorMessage(e));
+      if (!(e instanceof ApiError && e.code === "CANCELLED")) setFormError(authErrorMessage(e));
     } finally {
       setLoading(null);
     }
@@ -113,7 +116,7 @@ export default function LoginScreen() {
           accessibilityRole="link"
           hitSlop={8}
           style={styles.forgot}
-          onPress={() => Alert.alert("Resetare parolă", "Această funcție va fi disponibilă în curând.")}
+          onPress={() => router.push({ pathname: "/forgot-password", params: { email: values.email.trim() } })}
         >
           <Text variant="labelLarge" style={styles.link}>Ai uitat parola?</Text>
         </Pressable>

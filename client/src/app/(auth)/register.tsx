@@ -3,13 +3,15 @@ import { Pressable, StyleSheet, TextInput, View } from "react-native";
 import { Text } from "react-native-paper";
 import { useRouter } from "expo-router";
 import { colors } from "@/constants/theme";
+import { ApiError } from "@/services/api";
 import AuthShell from "@/components/auth/AuthShell";
 import FormError from "@/components/auth/FormError";
 import GoogleButton from "@/components/auth/GoogleButton";
 import SocialDivider from "@/components/auth/SocialDivider";
 import AppButton from "@/components/ui/AppButton";
 import TextField from "@/components/ui/TextField";
-import { authErrorMessage, register, signInWithGoogle } from "@/services/auth";
+import { authErrorMessage, register } from "@/services/auth";
+import { useGoogleSignIn } from "@/services/google";
 import { validateEmail, validateName, validateNewPassword } from "@/utils/validation";
 
 type Field = "name" | "email" | "password";
@@ -18,6 +20,7 @@ export default function RegisterScreen() {
   const router = useRouter();
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
+  const signInWithGoogle = useGoogleSignIn();
 
   const [values, setValues] = useState({ name: "", email: "", password: "" });
   const [touched, setTouched] = useState<Partial<Record<Field, boolean>>>({});
@@ -59,7 +62,7 @@ export default function RegisterScreen() {
       await signInWithGoogle();
       router.replace("/(tabs)");
     } catch (e) {
-      setFormError(authErrorMessage(e));
+      if (!(e instanceof ApiError && e.code === "CANCELLED")) setFormError(authErrorMessage(e));
     } finally {
       setLoading(null);
     }

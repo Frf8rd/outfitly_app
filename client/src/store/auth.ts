@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { MOCK_AUTH } from "@/constants/config";
-import { api, ApiError, setAuthToken, setUnauthorizedHandler } from "@/services/api";
+import { api, ApiError, setTokens, setTokensRefreshedHandler, setUnauthorizedHandler, type Tokens } from "@/services/api";
 import { queryClient } from "@/services/queryClient";
 import { clearSession, loadSession, saveSession } from "@/services/tokenStorage";
 
@@ -8,13 +8,15 @@ export type AuthUser = { id: string; name: string; email: string };
 
 type AuthState = {
   // loading = încă citim sesiunea de pe telefon (la pornire)
-  status: "loading" | "signedOut" | "signedIn";
+  status: "loading" | "signedIn" | "signedOut";
   user: AuthUser | null;
   bootstrap: () => Promise<void>;
-  setSession: (user: AuthUser, token: string) => Promise<void>;
+  setSession: (user: AuthUser, tokens: Tokens) => Promise<void>;
   updateUser: (patch: Partial<AuthUser>) => void;
   signOut: () => Promise<void>;
 };
+
+let currentTokens: Tokens | null = null;
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   status: "loading",
@@ -27,41 +29,58 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ status: "signedOut", user: null });
       return;
     }
-    setAuthToken(session.token);
+    currentTokens = { accessToken: session.accessToken, refreshToken: session.refreshToken };
+    setTokens(currentTokens);
     set({ status: "signedIn", user: session.user });
 
-    // Verificăm tokenul pe server în fundal. 401 -> api() face deja logout; erorile de rețea le ignorăm (rămâi logat offline).
+    // Verificăm sesiunea pe server în fundal (api() reînnoiește tokenul dacă a expirat; dacă nu se poate -> logout).
+    // Erorile de rețea le ignorăm: rămâi logat offline.
     if (!MOCK_AUTH) {
       try {
         const me = await api<{ user: AuthUser }>("/auth/me");
         set({ user: me.user });
-        await saveSession({ token: session.token, user: me.user });
+        if (currentTokens) await saveSession({ ...currentTokens, user: me.user });
       } catch (e) {
         if (!(e instanceof ApiError)) return;
       }
     }
   },
 
-  async setSession(user, token) {
-    setAuthToken(token);
-    await saveSession({ token, user });
+  async setSession(user, tokens) {
+    currentTokens = tokens;
+    setTokens(tokens);
+    await saveSession({ ...tokens, user });
     set({ status: "signedIn", user });
   },
 
   updateUser(patch) {
     const user = get().user;
-    if (user) set({ user: { ...user, ...patch } });
+    if (!user) return;
+    const next = { ...user, ...patch };
+    set({ user: next });
+    if (currentTokens) void saveSession({ ...currentTokens, user: next });
   },
 
   async signOut() {
-    setAuthToken(null);
+    const refreshToken = currentTokens?.refreshToken;
+    currentTokens = null;
+    // invalidăm sesiunea pe server (fără să blocăm deconectarea dacă nu avem net)
+    if (refreshToken && !MOCK_AUTH) api("/auth/logout", { method: "POST", body: { refreshToken } }).catch(() => {});
+    setTokens(null);
     await clearSession();
     queryClient.clear(); // să nu rămână în cache datele utilizatorului precedent
     set({ status: "signedOut", user: null });
   },
 }));
 
-// 401 de la server cu token activ = sesiune expirată -> logout automat
+// tokenuri reînnoite automat de api() -> le salvăm pe telefon
+setTokensRefreshedHandler((tokens) => {
+  currentTokens = tokens;
+  const user = useAuthStore.getState().user;
+  if (user) void saveSession({ ...tokens, user });
+});
+
+// sesiune care nu mai poate fi reînnoită = logout automat
 setUnauthorizedHandler(() => {
   if (useAuthStore.getState().status === "signedIn") void useAuthStore.getState().signOut();
 });

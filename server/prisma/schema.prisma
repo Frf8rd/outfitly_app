@@ -47,11 +47,18 @@ enum ChallengeStatus {
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
-  passwordHash String
+  passwordHash String?              // null pentru conturile create doar cu Google
+  googleId     String?  @unique
   name         String
   mainStyle    Style?
   quizAnswers  Json?
+  lastLoginAt  DateTime?
+  resetCodeHash    String?          // cod de resetare parolă (sha256), valabil 10 minute
+  resetCodeExpires DateTime?
+  resetAttempts    Int      @default(0)
   createdAt    DateTime @default(now())
+
+  refreshTokens RefreshToken[]
 
   wardrobe   WardrobeItem[]
   outfits    Outfit[]
@@ -147,4 +154,18 @@ model UserChallenge {
   challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
 
   @@id([userId, challengeId])
+}
+
+
+// Câte un rând per sesiune/dispozitiv. Tokenul real nu se salvează, doar hash-ul lui.
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
