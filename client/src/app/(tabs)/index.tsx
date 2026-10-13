@@ -1,78 +1,109 @@
 import { useState } from "react";
-import { ScrollView, View, StyleSheet } from "react-native";
+import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Chip, Surface, Text } from "react-native-paper";
+import { Text } from "react-native-paper";
+import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/constants/theme";
+import { CLOTHES } from "@/constants/clothes";
+import AppButton from "@/components/ui/AppButton";
+import WeatherCard from "@/components/home/WeatherCard";
+import OccasionPicker from "@/components/home/OccasionPicker";
+import OutfitPreview from "@/components/outfit/OutfitPreview";
+import type { Occasion, OutfitSuggestion, Weather } from "@/types/models";
 
-const OCCASIONS = ["Școală", "Întâlnire", "Petrecere", "Vacanță"];
+// ---- DATE MOCK: se înlocuiesc cu hook-uri (useAuth, useWeather, useTodayOutfit) ----
+const USER_NAME = "Andreea";
 
-const OUTFIT = [
-  { emoji: "👚", label: "Bluză", bg: "#FDE4EF" },
-  { emoji: "👖", label: "Blugi", bg: "#E6DDFB" },
-  { emoji: "👟", label: "Adidași", bg: "#FFF1D6" },
-];
+const WEATHER: Weather = { temperature: 18, condition: "clear", summary: "Cer senin", city: "Chișinău" };
+
+const SUGGESTION: OutfitSuggestion = {
+  name: "Look casual",
+  occasion: "EVERYDAY",
+  isFavorite: false,
+  items: [
+    { id: "1", name: "Pulover verde", category: "TOP", image: CLOTHES.pulover },
+    { id: "2", name: "Pantaloni crem", category: "BOTTOM", image: CLOTHES.pantaloni },
+    { id: "3", name: "Sneakers", category: "SHOES", image: CLOTHES.adidasi },
+  ],
+};
+// ------------------------------------------------------------------------------------
 
 export default function HomeScreen() {
-  const [occasion, setOccasion] = useState("Școală");
+  const [occasion, setOccasion] = useState<Occasion>("EVERYDAY");
+  const [isFavorite, setIsFavorite] = useState(SUGGESTION.isFavorite);
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <View>
-          <Text variant="headlineMedium" style={styles.title}>Salut! 👋</Text>
-          <Text variant="bodyMedium" style={styles.muted}>Stilul tău, regulile tale!</Text>
+        {/* Header */}
+        <View style={[styles.header, styles.padded]}>
+          <View style={styles.headerText}>
+            <View style={styles.greetingRow}>
+              <Text variant="headlineSmall" style={styles.greeting}>
+                Bună, {USER_NAME}!
+              </Text>
+              <Ionicons name="heart-outline" size={20} color={colors.primary} />
+            </View>
+            <Text variant="bodyMedium" style={styles.muted}>
+              Astăzi e o zi perfectă pentru un outfit nou!
+            </Text>
+          </View>
+
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Notificări"
+            hitSlop={10}
+            onPress={() => console.log("TODO: notificări")}
+          >
+            <Ionicons name="notifications-outline" size={24} color={colors.ink} />
+          </Pressable>
         </View>
 
-        <Surface style={styles.weather} elevation={0}>
-          <Text style={styles.weatherEmoji}>🌤️</Text>
-          <View style={{ flex: 1 }}>
-            <Text variant="titleLarge" style={styles.weatherTemp}>18°C</Text>
-            <Text variant="bodyMedium" style={styles.weatherText}>Parțial noros · ia o jachetă ușoară</Text>
-          </View>
-        </Surface>
+        {/* Vreme */}
+        <View style={styles.padded}>
+          <WeatherCard weather={WEATHER} />
+        </View>
 
-        <Text variant="titleMedium" style={styles.section}>Pentru ce ocazie?</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
-          {OCCASIONS.map((o) => (
-            <Chip
-              key={o}
-              selected={occasion === o}
-              showSelectedCheck={false}
-              onPress={() => setOccasion(o)}
-              style={[styles.chip, occasion === o && styles.chipActive]}
-              textStyle={occasion === o ? styles.chipTextActive : styles.chipText}
+        {/* Ocazie */}
+        <View style={styles.block}>
+          <Text variant="titleMedium" style={[styles.sectionTitle, styles.padded]}>
+            Pentru ce ocazie?
+          </Text>
+          <OccasionPicker value={occasion} onChange={setOccasion} />
+        </View>
+
+        {/* Ținuta zilei */}
+        <View style={[styles.block, styles.padded]}>
+          <View style={styles.sectionRow}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>
+              Ținuta zilei
+            </Text>
+            <Pressable
+              accessibilityRole="link"
+              onPress={() => console.log("TODO: Vezi sugestia")}
+              style={styles.linkRow}
             >
-              {o}
-            </Chip>
-          ))}
-        </ScrollView>
-
-        <Text variant="titleMedium" style={styles.section}>Ținuta zilei</Text>
-        <Surface style={styles.outfitCard} elevation={2}>
-          <View style={styles.items}>
-            {OUTFIT.map((item) => (
-              <View key={item.label} style={styles.itemWrap}>
-                <View style={[styles.item, { backgroundColor: item.bg }]}>
-                  <Text style={styles.itemEmoji}>{item.emoji}</Text>
-                </View>
-                <Text variant="labelMedium" style={styles.muted}>{item.label}</Text>
-              </View>
-            ))}
+              <Text variant="labelLarge" style={styles.link}>
+                Vezi sugestia
+              </Text>
+              <Ionicons name="chevron-forward" size={14} color={colors.primary} />
+            </Pressable>
           </View>
-          <Text variant="bodyMedium" style={styles.muted}>Potrivită pentru: {occasion}</Text>
-          <Button icon="heart-outline" mode="outlined" style={styles.saveBtn}>Salvează la favorite</Button>
-        </Surface>
 
-        <Button
-          mode="contained"
-          icon="auto-fix"
-          style={styles.surprise}
-          contentStyle={styles.surpriseContent}
-          labelStyle={styles.surpriseLabel}
-          onPress={() => console.log("Surprinde-mă!")}
-        >
-          Surprinde-mă!
-        </Button>
+          <OutfitPreview
+            items={SUGGESTION.items}
+            isFavorite={isFavorite}
+            onToggleFavorite={() => setIsFavorite((v) => !v)}
+          />
+
+          <AppButton label="Vezi ținuta" onPress={() => console.log("TODO: Vezi ținuta")} />
+          <AppButton
+            label="Surprinde-mă!"
+            variant="outline"
+            icon="sparkles-outline"
+            onPress={() => console.log("TODO: Surprinde-mă")}
+          />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -80,26 +111,16 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
-  content: { padding: 20, gap: 14 },
-  title: { fontWeight: "800", color: colors.text },
-  muted: { color: "#7a6b8a" },
-  weather: { flexDirection: "row", alignItems: "center", gap: 14, padding: 18, borderRadius: 24, backgroundColor: colors.pink },
-  weatherEmoji: { fontSize: 44 },
-  weatherTemp: { fontWeight: "800", color: colors.text },
-  weatherText: { color: colors.text },
-  section: { marginTop: 6, fontWeight: "700", color: colors.text },
-  chips: { gap: 8, paddingRight: 20 },
-  chip: { backgroundColor: "#fff", borderRadius: 20, borderWidth: 1, borderColor: colors.lavender },
-  chipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-  chipText: { color: colors.text },
-  chipTextActive: { color: "#fff", fontWeight: "700" },
-  outfitCard: { padding: 18, borderRadius: 24, backgroundColor: "#fff", gap: 12 },
-  items: { flexDirection: "row", justifyContent: "space-between" },
-  itemWrap: { alignItems: "center", gap: 6, flex: 1 },
-  item: { width: 84, height: 84, borderRadius: 22, alignItems: "center", justifyContent: "center" },
-  itemEmoji: { fontSize: 40 },
-  saveBtn: { borderColor: colors.primary },
-  surprise: { borderRadius: 28, marginTop: 4 },
-  surpriseContent: { paddingVertical: 8 },
-  surpriseLabel: { fontSize: 16, fontWeight: "700" },
+  content: { paddingTop: 12, paddingBottom: 28, gap: 18 },
+  padded: { paddingHorizontal: 20 },
+  header: { flexDirection: "row", alignItems: "flex-start", gap: 12 },
+  headerText: { flex: 1, gap: 2 },
+  greetingRow: { flexDirection: "row", alignItems: "center", gap: 6 },
+  greeting: { fontWeight: "800", color: colors.ink },
+  muted: { color: colors.muted },
+  block: { gap: 12 },
+  sectionRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  sectionTitle: { fontWeight: "700", color: colors.ink },
+  linkRow: { flexDirection: "row", alignItems: "center", gap: 2 },
+  link: { color: colors.primary, fontWeight: "600" },
 });
