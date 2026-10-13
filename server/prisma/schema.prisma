@@ -1,0 +1,150 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Category {
+  TOP
+  BOTTOM
+  DRESS
+  OUTERWEAR
+  SHOES
+  ACCESSORY
+}
+
+enum Style {
+  CASUAL
+  SPORT
+  ELEGANT
+  STREETWEAR
+  COQUETTE
+}
+
+enum Occasion {
+  EVERYDAY
+  SCHOOL
+  DATE
+  PARTY
+  VACATION
+  WORK
+}
+
+enum OutfitSource {
+  MANUAL
+  TODAY
+  SURPRISE
+}
+
+enum ChallengeStatus {
+  JOINED
+  COMPLETED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  mainStyle    Style?
+  quizAnswers  Json?
+  createdAt    DateTime @default(now())
+
+  wardrobe   WardrobeItem[]
+  outfits    Outfit[]
+  wearLogs   WearLog[]
+  challenges UserChallenge[]
+}
+
+model CatalogItem {
+  id         String   @id @default(cuid())
+  name       String
+  category   Category
+  subtype    String                 // ex: "tricou", "blugi", "sneakers"
+  color      String                 // ex: "alb", "negru"
+  styles     Style[]
+  warmth     Int                    // 1 (foarte ușor) … 5 (foarte gros)
+  waterproof Boolean  @default(false)
+  imageUrl   String
+  createdAt  DateTime @default(now())
+
+  owners WardrobeItem[]
+
+  @@index([category])
+}
+
+model WardrobeItem {
+  id            String   @id @default(cuid())
+  userId        String
+  catalogItemId String
+  addedAt       DateTime @default(now())
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  catalogItem CatalogItem  @relation(fields: [catalogItemId], references: [id])
+  outfitItems OutfitItem[]
+
+  @@unique([userId, catalogItemId])
+}
+
+model Outfit {
+  id         String       @id @default(cuid())
+  userId     String
+  name       String
+  occasion   Occasion     @default(EVERYDAY)
+  source     OutfitSource @default(MANUAL)
+  isFavorite Boolean      @default(false)
+  createdAt  DateTime     @default(now())
+
+  user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items    OutfitItem[]
+  wearLogs WearLog[]
+
+  @@index([userId, isFavorite])
+}
+
+model OutfitItem {
+  outfitId       String
+  wardrobeItemId String
+
+  outfit       Outfit       @relation(fields: [outfitId], references: [id], onDelete: Cascade)
+  wardrobeItem WardrobeItem @relation(fields: [wardrobeItemId], references: [id], onDelete: Cascade)
+
+  @@id([outfitId, wardrobeItemId])
+}
+
+model WearLog {
+  id       String   @id @default(cuid())
+  userId   String
+  outfitId String
+  wornOn   DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  outfit Outfit @relation(fields: [outfitId], references: [id], onDelete: Cascade)
+
+  @@index([userId, wornOn])
+}
+
+model Challenge {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  startsAt    DateTime
+  endsAt      DateTime
+
+  users UserChallenge[]
+}
+
+model UserChallenge {
+  userId      String
+  challengeId String
+  status      ChallengeStatus @default(JOINED)
+  completedAt DateTime?
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  @@id([userId, challengeId])
+}
