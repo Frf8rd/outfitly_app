@@ -47,7 +47,7 @@ export default function RegisterScreen() {
     setFormError(null);
     try {
       await register(values.name.trim(), values.email.trim().toLowerCase(), values.password);
-      router.replace("/style-quiz"); // testul de stil, apoi tab-urile
+      router.replace({ pathname: "/style-quiz", params: { first: "1" } }); // testul de stil (o singură dată), apoi tab-urile
     } catch (e) {
       setFormError(authErrorMessage(e));
     } finally {

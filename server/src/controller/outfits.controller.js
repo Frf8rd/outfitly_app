@@ -72,6 +72,11 @@ export const remove = wrap(async (req, res) => {
 export const wear = wrap(async (req, res) => {
   const existing = await prisma.outfit.findFirst({ where: { id: req.params.id, userId: req.user.id }, select: { id: true } });
   if (!existing) throw notFound();
+  // dublă apăsare: dacă ținuta a fost deja marcată în ultimele 6 ore, o întoarcem pe aceea
+  const recent = await prisma.wearLog.findFirst({
+    where: { userId: req.user.id, outfitId: existing.id, wornOn: { gte: new Date(Date.now() - 6 * 36e5) } },
+  });
+  if (recent) return res.json({ id: recent.id, wornOn: recent.wornOn });
   const log = await prisma.wearLog.create({ data: { userId: req.user.id, outfitId: existing.id } });
   res.status(201).json({ id: log.id, wornOn: log.wornOn });
 });

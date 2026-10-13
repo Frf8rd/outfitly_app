@@ -32,3 +32,22 @@ export const deleteMe = wrap(async (req, res) => {
   await prisma.user.delete({ where: { id: req.user.id } });
   res.status(204).end();
 });
+
+// Stilul principal = cel mai frecvent răspuns; la egalitate câștigă primul întâlnit (la fel ca în aplicație).
+export function computeMainStyle(answers) {
+  const counts = new Map();
+  for (const a of answers) counts.set(a, (counts.get(a) ?? 0) + 1);
+  let best = null;
+  for (const [style, n] of counts) if (best === null || n > counts.get(best)) best = style;
+  return best;
+}
+
+// PUT /users/me/style-quiz { answers: Style[] } -> { user }
+export const saveStyleQuiz = wrap(async (req, res) => {
+  const { answers } = req.body;
+  const user = await prisma.user.update({
+    where: { id: req.user.id },
+    data: { mainStyle: computeMainStyle(answers), quizAnswers: answers },
+  });
+  res.json({ user: publicUser(user) });
+});

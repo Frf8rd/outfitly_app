@@ -8,7 +8,7 @@ const KEY = "stilora.session";
 export type StoredSession = {
   accessToken: string;
   refreshToken: string;
-  user: { id: string; name: string; email: string };
+  user: { id: string; name: string; email: string; mainStyle?: string | null; hasPassword?: boolean };
 };
 
 export async function saveSession(session: StoredSession): Promise<void> {

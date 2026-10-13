@@ -11,6 +11,8 @@ function useRefreshing() {
       qc.invalidateQueries({ queryKey: ["wardrobe"] }),
       qc.invalidateQueries({ queryKey: ["catalog"] }),
       qc.invalidateQueries({ queryKey: ["outfits"] }),
+      qc.invalidateQueries({ queryKey: ["suggestions"] }),
+      qc.invalidateQueries({ queryKey: ["stats"] }),
     ]);
 }
 

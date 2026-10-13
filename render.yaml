@@ -1,0 +1,33 @@
+# Render Blueprint: New + -> Blueprint -> alege repo-ul. Variabilele cu sync:false se completează în dashboard.
+services:
+  - type: web
+    name: stilora-api
+    runtime: node
+    rootDir: server
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL     # Neon, adresa cu -pooler
+        sync: false
+      - key: DIRECT_URL       # Neon, adresa directă (migrări)
+        sync: false
+      - key: PUBLIC_URL       # https://stilora-api.onrender.com
+        sync: false
+      - key: GOOGLE_WEB_CLIENT_ID
+        sync: false
+      - key: GOOGLE_ANDROID_CLIENT_ID
+        sync: false
+      - key: GOOGLE_IOS_CLIENT_ID
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false

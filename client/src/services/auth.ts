@@ -58,10 +58,11 @@ export async function updateName(name: string): Promise<void> {
   useAuthStore.getState().updateUser({ name });
 }
 
-export async function changePassword(currentPassword: string, password: string): Promise<void> {
+// currentPassword lipsește la conturile Google fără parolă (își setează prima parolă)
+export async function changePassword(currentPassword: string | undefined, password: string): Promise<void> {
   if (MOCK_AUTH) return void (await wait(400));
   // serverul închide celelalte sesiuni și întoarce una nouă pentru acest telefon
-  const res = await api<AuthResponse>("/users/me", { method: "PATCH", body: { currentPassword, password } });
+  const res = await api<AuthResponse>("/users/me", { method: "PATCH", body: { currentPassword: currentPassword || undefined, password } });
   await startSession(res);
 }
 

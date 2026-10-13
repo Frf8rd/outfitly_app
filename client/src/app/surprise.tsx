@@ -1,44 +1,70 @@
 import { useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { colors } from "@/constants/theme";
-import { MOCK_OUTFITS } from "@/constants/mock";
 import AppButton from "@/components/ui/AppButton";
+import EmptyState from "@/components/ui/EmptyState";
 import ScreenHeader from "@/components/ui/ScreenHeader";
 import OutfitPreview from "@/components/outfit/OutfitPreview";
-import type { SavedOutfit } from "@/components/outfit/OutfitCard";
+import { OCCASIONS } from "@/components/home/OccasionPicker";
+import { useSuggestionOutfit, useSurprise } from "@/hooks/useSuggestions";
+import { ApiError } from "@/services/api";
+import { toPiece } from "@/services/wardrobe";
+import type { Occasion, Suggestion } from "@/types/models";
 
 export default function Surprise() {
   const router = useRouter();
-  const [result, setResult] = useState<SavedOutfit | null>(null);
-  const [loading, setLoading] = useState(false);
+  const params = useLocalSearchParams<{ occasion?: string }>();
+  const occasion = (OCCASIONS.find((o) => o.value === params.occasion)?.value ?? "EVERYDAY") as Occasion;
 
-  async function surprise() {
-    setLoading(true);
-    // TODO: POST /suggestions/surprise  (acum: alegere aleatoare din mock, alta decât precedenta)
-    await new Promise((r) => setTimeout(r, 600));
-    const options = MOCK_OUTFITS.filter((o) => o.id !== result?.id);
-    setResult(options[Math.floor(Math.random() * options.length)]);
-    setLoading(false);
+  const [result, setResult] = useState<Suggestion | null>(null);
+  const [seen, setSeen] = useState<string[]>([]); // ca „Încă una!” să nu repete aceeași ținută
+  const [tooSmall, setTooSmall] = useState(false);
+  const surprise = useSurprise();
+  const outfit = useSuggestionOutfit(result ?? undefined, "SURPRISE");
+
+  const fail = (e: unknown, fallback: string) => Alert.alert("Eroare", e instanceof ApiError ? e.message : fallback);
+
+  async function roll() {
+    try {
+      const s = await surprise.mutateAsync({ occasion, previousKeys: seen.slice(-10) });
+      setResult(s);
+      setSeen((l) => [...l, s.key]);
+    } catch (e) {
+      if (e instanceof ApiError && e.status === 422) setTooSmall(true);
+      else fail(e, "Nu am putut alege o ținută. Încearcă din nou.");
+    }
   }
 
   return (
     <SafeAreaView style={styles.safe}>
       <ScreenHeader title="Surprinde-mă!" />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {result ? (
+        {tooSmall ? (
+          <EmptyState
+            emoji="👗"
+            title="Garderoba e prea mică"
+            message="Adaugă un top și un pantalon (sau o rochie) ca să te pot surprinde."
+            actionLabel="Adaugă haine"
+            onAction={() => router.replace("/(tabs)/wardrobe")}
+          />
+        ) : result ? (
           <>
             <OutfitPreview
-              items={result.items}
-              isFavorite={result.isFavorite}
-              onToggleFavorite={() => setResult({ ...result, isFavorite: !result.isFavorite })} // TODO: POST /outfits
+              items={result.items.map((w) => toPiece(w))}
+              isFavorite={outfit.isFavorite}
+              onToggleFavorite={() => outfit.toggleFavorite().catch((e) => fail(e, "Nu am putut salva ținuta."))}
             />
             <Text variant="titleMedium" style={styles.title}>{result.name}</Text>
-            <AppButton label="Vezi detalii" onPress={() => router.push(`/outfit/${result.id}`)} />
-            <AppButton label="Încă una!" variant="outline" icon="sparkles-outline" loading={loading} onPress={surprise} />
+            <AppButton
+              label="Vezi detalii"
+              loading={outfit.busy}
+              onPress={() => outfit.ensureSaved().then((id) => router.push(`/outfit/${id}`)).catch((e) => fail(e, "Nu am putut deschide ținuta."))}
+            />
+            <AppButton label="Încă una!" variant="outline" icon="sparkles-outline" loading={surprise.isPending} onPress={roll} />
           </>
         ) : (
           <View style={styles.intro}>
@@ -49,7 +75,7 @@ export default function Surprise() {
             <Text variant="bodyLarge" style={styles.muted}>
               Apasă butonul și primește o ținută aleatoare din garderoba ta!
             </Text>
-            <AppButton label="Surprinde-mă!" icon="sparkles-outline" loading={loading} onPress={surprise} style={{ alignSelf: "stretch" }} />
+            <AppButton label="Surprinde-mă!" icon="sparkles-outline" loading={surprise.isPending} onPress={roll} style={{ alignSelf: "stretch" }} />
           </View>
         )}
       </ScrollView>

@@ -5,17 +5,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { Href, useRouter } from "expo-router";
 import { colors, radius } from "@/constants/theme";
 import type { ComponentProps } from "react";
+import { useStats } from "@/hooks/useEngagement";
 import { useAuthStore } from "@/store/auth";
+import type { Style } from "@/types/models";
 
-// ---- DATE MOCK: se înlocuiesc cu GET /auth/me și GET /stats ----
-const USER = { style: "Casual", clothes: 24, outfits: 8, unworn: 11 };
-// -----------------------------------------------------------------
-
-const STATS = [
-  { label: "Haine", value: USER.clothes },
-  { label: "Ținute", value: USER.outfits },
-  { label: "Nepurtate (30 zile)", value: USER.unworn },
-];
+const STYLE_LABEL: Record<Style, string> = { CASUAL: "Casual", SPORT: "Sport", ELEGANT: "Elegant", STREETWEAR: "Streetwear", COQUETTE: "Coquette" };
 
 const ROWS: { icon: ComponentProps<typeof Ionicons>["name"]; label: string; sub: string; href: Href }[] = [
   { icon: "calendar-outline", label: "Jurnal", sub: "Ce ai purtat în fiecare zi", href: "/journal" },
@@ -27,6 +21,15 @@ const ROWS: { icon: ComponentProps<typeof Ionicons>["name"]; label: string; sub:
 export default function Profile() {
   const router = useRouter();
   const name = useAuthStore((s) => s.user?.name) ?? "";
+  const mainStyle = useAuthStore((s) => s.user?.mainStyle);
+  const { data: stats } = useStats();
+  const show = (n?: number) => (n === undefined ? "–" : n);
+  const STATS = [
+    { label: "Haine", value: show(stats?.wardrobeCount) },
+    { label: "Ținute", value: show(stats?.outfitCount) },
+    { label: "Nepurtate (30 zile)", value: show(stats?.unwornCount) },
+    { label: "Ținute purtate", value: show(stats?.wornOutfitCount) },
+  ];
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
@@ -36,10 +39,10 @@ export default function Profile() {
             <Text variant="headlineMedium" style={styles.avatarText}>{name[0]?.toUpperCase()}</Text>
           </View>
           <Text variant="headlineSmall" style={styles.name}>{name}</Text>
-          <View style={styles.styleChip}>
+          <Pressable accessibilityRole="button" onPress={() => router.push("/style-quiz")} style={styles.styleChip}>
             <Ionicons name="sparkles-outline" size={14} color={colors.primary} />
-            <Text variant="labelLarge" style={styles.styleText}>Stilul tău: {USER.style}</Text>
-          </View>
+            <Text variant="labelLarge" style={styles.styleText}>{mainStyle ? `Stilul tău: ${STYLE_LABEL[mainStyle]}` : "Descoperă-ți stilul"}</Text>
+          </Pressable>
         </View>
 
         <View style={styles.stats}>
@@ -85,8 +88,8 @@ const styles = StyleSheet.create({
   name: { fontWeight: "800", color: colors.ink },
   styleChip: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 12, height: 30, borderRadius: radius.pill, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.mist },
   styleText: { color: colors.primary, fontWeight: "700" },
-  stats: { flexDirection: "row", gap: 10 },
-  stat: { flex: 1, alignItems: "center", gap: 2, padding: 14, borderRadius: radius.md, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.mist },
+  stats: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
+  stat: { width: "48%", flexGrow: 1, alignItems: "center", gap: 2, padding: 14, borderRadius: radius.md, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.mist },
   statValue: { fontWeight: "800", color: colors.primary },
   menu: { borderRadius: radius.md, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.mist, overflow: "hidden" },
   row: { flexDirection: "row", alignItems: "center", gap: 12, padding: 14 },

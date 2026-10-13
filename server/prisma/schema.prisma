@@ -138,10 +138,13 @@ model Challenge {
   id          String   @id @default(cuid())
   title       String
   description String
+  icon        String   @default("trophy-outline") // nume Ionicons, folosit de aplicație
   startsAt    DateTime
   endsAt      DateTime
 
   users UserChallenge[]
+
+  @@unique([title, startsAt])
 }
 
 model UserChallenge {

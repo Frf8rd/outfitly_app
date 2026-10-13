@@ -1,11 +1,13 @@
-import { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { Alert, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "react-native-paper";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { colors, radius } from "@/constants/theme";
 import AppButton from "@/components/ui/AppButton";
 import ScreenHeader from "@/components/ui/ScreenHeader";
+import { saveStyleQuiz } from "@/services/users";
+import { useAuthStore } from "@/store/auth";
 
 type Style = "CASUAL" | "SPORT" | "ELEGANT" | "STREETWEAR" | "COQUETTE";
 
@@ -37,17 +39,46 @@ const QUESTIONS: { q: string; options: { t: string; s: Style }[] }[] = [
 
 export default function StyleQuiz() {
   const router = useRouter();
+  const { first } = useLocalSearchParams<{ first?: string }>(); // first=1: deschis automat după înregistrare
+  const hadStyle = useRef(!!useAuthStore.getState().user?.mainStyle);
   const [step, setStep] = useState(-1); // -1 = început, 0..n-1 = întrebări, n = rezultat
   const [answers, setAnswers] = useState<Style[]>([]);
+  const [save, setSave] = useState<"idle" | "saving" | "saved" | "error">("idle");
+
+  // Gard „doar o dată”: fluxul de după înregistrare nu mai arată testul dacă stilul e deja salvat
+  // (ex: revii la ecran după ce l-ai făcut). Din Profil testul se poate reface oricând.
+  useEffect(() => {
+    if (first && hadStyle.current) router.replace("/(tabs)");
+  }, [first, router]);
 
   const total = QUESTIONS.length;
   const goHome = () => router.replace("/(tabs)");
+
+  async function submit(list: Style[]) {
+    setSave("saving");
+    try {
+      await saveStyleQuiz(list); // serverul calculează și salvează stilul principal
+      setSave("saved");
+      return true;
+    } catch {
+      setSave("error");
+      return false;
+    }
+  }
 
   function answer(s: Style) {
     const next = [...answers.slice(0, step), s];
     setAnswers(next);
     setStep(step + 1);
-    // TODO la final: PUT /users/me/style-quiz { answers: next }
+    if (next.length === total) void submit(next);
+  }
+
+  async function onContinue() {
+    if (save === "error" && !(await submit(answers))) {
+      Alert.alert("Nu am putut salva stilul", "Poți reface testul oricând din Profil.", [{ text: "Continuă", onPress: goHome }]);
+      return;
+    }
+    goHome();
   }
 
   function back() {
@@ -108,7 +139,10 @@ export default function StyleQuiz() {
             <Text variant="bodyLarge" style={styles.muted}>Stilul tău principal este</Text>
             <Text variant="displaySmall" style={styles.title}>{RESULTS[winner].label}</Text>
             <Text variant="bodyLarge" style={[styles.muted, styles.centerText]}>{RESULTS[winner].text}</Text>
-            <AppButton label="Continuă" onPress={goHome} style={styles.full} />
+            {save === "error" ? (
+              <Text variant="bodySmall" style={[styles.muted, styles.centerText]}>Nu s-a salvat încă. Apasă „Continuă” ca să reîncerc.</Text>
+            ) : null}
+            <AppButton label="Continuă" loading={save === "saving"} onPress={onContinue} style={styles.full} />
           </View>
         )}
       </ScrollView>

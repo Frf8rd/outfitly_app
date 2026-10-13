@@ -33,7 +33,19 @@
           "imageWidth": 200
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Stilora folosește locația ca să afle vremea și să-ți aleagă ținuta potrivită."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#E6DDFB"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

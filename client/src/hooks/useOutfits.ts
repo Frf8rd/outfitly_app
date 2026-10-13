@@ -12,7 +12,7 @@ export const useOutfit = (id: string | undefined) =>
 
 function useRefresh() {
   const qc = useQueryClient();
-  return () => qc.invalidateQueries({ queryKey: ["outfits"] });
+  return () => Promise.all([qc.invalidateQueries({ queryKey: ["outfits"] }), qc.invalidateQueries({ queryKey: ["stats"] })]);
 }
 
 export function useCreateOutfit() {
@@ -30,4 +30,12 @@ export function useDeleteOutfit() {
   return useMutation({ mutationFn: deleteOutfit, onSuccess: refresh });
 }
 
-export const useWearOutfit = () => useMutation({ mutationFn: wearOutfit });
+// Ținuta purtată alimentează jurnalul, statisticile și evitarea repetițiilor din sugestii
+export function useWearOutfit() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: wearOutfit,
+    onSuccess: () =>
+      Promise.all(["wearlogs", "stats", "suggestions"].map((k) => qc.invalidateQueries({ queryKey: [k] }))),
+  });
+}

@@ -1,10 +1,13 @@
 import { create } from "zustand";
+import type { Style } from "@/types/models";
 import { MOCK_AUTH } from "@/constants/config";
 import { api, ApiError, setTokens, setTokensRefreshedHandler, setUnauthorizedHandler, type Tokens } from "@/services/api";
 import { queryClient } from "@/services/queryClient";
 import { clearSession, loadSession, saveSession } from "@/services/tokenStorage";
+import { disableReminder } from "@/services/notifications";
 
-export type AuthUser = { id: string; name: string; email: string };
+// hasPassword = false la conturile create doar cu Google
+export type AuthUser = { id: string; name: string; email: string; mainStyle?: Style | null; hasPassword?: boolean };
 
 type AuthState = {
   // loading = încă citim sesiunea de pe telefon (la pornire)
@@ -31,7 +34,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
     currentTokens = { accessToken: session.accessToken, refreshToken: session.refreshToken };
     setTokens(currentTokens);
-    set({ status: "signedIn", user: session.user });
+    set({ status: "signedIn", user: session.user as AuthUser });
 
     // Verificăm sesiunea pe server în fundal (api() reînnoiește tokenul dacă a expirat; dacă nu se poate -> logout).
     // Erorile de rețea le ignorăm: rămâi logat offline.
@@ -68,6 +71,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (refreshToken && !MOCK_AUTH) api("/auth/logout", { method: "POST", body: { refreshToken } }).catch(() => {});
     setTokens(null);
     await clearSession();
+    void disableReminder(); // notificarea zilnică aparține contului care a ieșit
     queryClient.clear(); // să nu rămână în cache datele utilizatorului precedent
     set({ status: "signedOut", user: null });
   },

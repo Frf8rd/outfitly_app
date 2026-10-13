@@ -5,6 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { PaperProvider } from "react-native-paper";
 import { theme } from "@/constants/theme";
 import { queryClient } from "@/services/queryClient";
+import { onNotificationTap } from "@/services/notifications";
 import { useAuthStore } from "@/store/auth";
 
 // Ținem splash-ul pe ecran până știm dacă există o sesiune salvată (altfel se vede un flash de login).
@@ -31,6 +32,16 @@ function useAuthGate() {
   }, [status]);
 }
 
+// Tap pe notificarea de dimineață -> ecranul „Ținuta zilei” (doar dacă ești logat)
+function useNotificationTap() {
+  const router = useRouter();
+  const status = useAuthStore((s) => s.status);
+  useEffect(() => {
+    if (status !== "signedIn") return;
+    return onNotificationTap(() => router.push("/today"));
+  }, [status, router]);
+}
+
 export default function RootLayout() {
   const bootstrap = useAuthStore((s) => s.bootstrap);
   useEffect(() => {
@@ -38,6 +49,7 @@ export default function RootLayout() {
   }, [bootstrap]);
 
   useAuthGate();
+  useNotificationTap();
 
   return (
     <QueryClientProvider client={queryClient}>

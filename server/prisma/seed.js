@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { readFileSync } from "node:fs";
 import { prisma } from "../src/config/db.js";
+import { ensureChallenges } from "../src/services/challenges.service.js";
 
 // Populează catalogul global. Se poate rula de mai multe ori: articolele se identifică după nume + culoare.
 // imageUrl gol = aplicația arată un emoji; pune PNG-uri în server/public/catalog/ și completează "imageUrl" în catalog.seed.json.
@@ -19,4 +20,6 @@ for (const item of items) {
   }
 }
 console.log(`Catalog: ${created} create, ${updated} actualizate.`);
+await ensureChallenges();
+console.log("Provocări: săptămâna curentă și următoarea sunt create.");
 await prisma.$disconnect();

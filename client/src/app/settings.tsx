@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Switch, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "react-native-paper";
@@ -6,6 +6,7 @@ import { colors, radius } from "@/constants/theme";
 import AppButton from "@/components/ui/AppButton";
 import ScreenHeader from "@/components/ui/ScreenHeader";
 import TextField from "@/components/ui/TextField";
+import { disableReminder, enableReminder, isReminderEnabled, REMINDER_TIME, remindersSupported } from "@/services/notifications";
 import { authErrorMessage, changePassword, deleteAccount as removeAccount, logout as signOut, updateName } from "@/services/auth";
 import { useAuthStore } from "@/store/auth";
 import { validateName, validateNewPassword } from "@/utils/validation";
@@ -18,10 +19,31 @@ export default function Settings() {
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
   const [passSubmitted, setPassSubmitted] = useState(false);
-  const [notifications, setNotifications] = useState(true);
+  const [notifications, setNotifications] = useState(false);
+  // conturile create cu Google nu au parolă: nu cerem „parola actuală”
+  const hasPassword = user?.hasPassword !== false;
+
+  useEffect(() => {
+    isReminderEnabled().then(setNotifications);
+  }, []);
+
+  async function toggleNotifications(on: boolean) {
+    if (!remindersSupported) {
+      Alert.alert("Indisponibil aici", "Notificările locale nu funcționează în Expo Go pe Android. Folosește un build de dezvoltare sau `eas build --profile preview`.");
+      return;
+    }
+    if (!on) {
+      setNotifications(false);
+      await disableReminder();
+      return;
+    }
+    const ok = await enableReminder();
+    setNotifications(ok);
+    if (!ok) Alert.alert("Notificările sunt oprite", "Permite notificările din setările telefonului ca să primești ținuta zilei.");
+  }
 
   const nameError = nameTouched ? validateName(name) : undefined;
-  const currentError = passSubmitted && !current ? "Introdu parola actuală." : undefined;
+  const currentError = hasPassword && passSubmitted && !current ? "Introdu parola actuală." : undefined;
   const nextError = passSubmitted ? validateNewPassword(next) : undefined;
 
   async function saveName() {
@@ -37,10 +59,10 @@ export default function Settings() {
 
   async function savePassword() {
     setPassSubmitted(true);
-    if (!current || validateNewPassword(next)) return;
+    if ((hasPassword && !current) || validateNewPassword(next)) return;
     try {
-      await changePassword(current, next);
-      Alert.alert("Salvat", "Parola a fost schimbată.");
+      await changePassword(hasPassword ? current : undefined, next);
+      Alert.alert("Salvat", hasPassword ? "Parola a fost schimbată." : "Parola a fost setată.");
       setCurrent("");
       setNext("");
       setPassSubmitted(false);
@@ -98,7 +120,8 @@ export default function Settings() {
           </View>
 
           <View style={styles.card}>
-            <Text variant="titleMedium" style={styles.section}>Schimbă parola</Text>
+            <Text variant="titleMedium" style={styles.section}>{hasPassword ? "Schimbă parola" : "Setează o parolă"}</Text>
+            {hasPassword ? (
             <TextField
               label="Parola actuală"
               icon="lock-closed-outline"
@@ -109,6 +132,9 @@ export default function Settings() {
               autoCapitalize="none"
               autoComplete="current-password"
             />
+            ) : (
+              <Text variant="bodySmall" style={styles.muted}>Te-ai înregistrat cu Google. Poți seta o parolă ca să te conectezi și cu email.</Text>
+            )}
             <TextField
               label="Parola nouă"
               icon="lock-closed-outline"
@@ -120,17 +146,17 @@ export default function Settings() {
               autoCapitalize="none"
               autoComplete="new-password"
             />
-            <AppButton label="Schimbă parola" variant="outline" onPress={savePassword} />
+            <AppButton label={hasPassword ? "Schimbă parola" : "Setează parola"} variant="outline" onPress={savePassword} />
           </View>
 
           <View style={[styles.card, styles.switchRow]}>
             <View style={{ flex: 1 }}>
               <Text variant="titleSmall" style={styles.switchLabel}>Notificări</Text>
-              <Text variant="bodySmall" style={styles.muted}>„Ținuta ta de azi e gata” dimineața</Text>
+              <Text variant="bodySmall" style={styles.muted}>„Ținuta ta de azi e gata” în fiecare dimineață la {REMINDER_TIME}</Text>
             </View>
             <Switch
               value={notifications}
-              onValueChange={setNotifications} // TODO: programează notificarea locală
+              onValueChange={toggleNotifications}
               trackColor={{ true: colors.accent, false: colors.mist }}
               thumbColor="#fff"
               accessibilityLabel="Notificări"

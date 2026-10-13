@@ -77,3 +77,32 @@ export type Stats = {
 
 // Lista paginată de la GET /catalog
 export type Paginated<T> = { items: T[]; page: number; limit: number; total: number };
+
+
+// ---- Faza 3-4 ----
+export type WeatherData = { temperature: number; condition: Weather["condition"]; summary: string };
+
+// Sugestie de la GET /suggestions/today și POST /suggestions/surprise (nu e salvată pe server până o salvezi ca ținută)
+export type Suggestion = {
+  key: string; // identifică combinația de piese
+  name: string;
+  occasion: Occasion;
+  weather: WeatherData | null;
+  items: WardrobeItem[];
+};
+
+export type WearLog = { id: string; wornOn: string; outfit: Outfit };
+
+export type ChallengeStatus = "ACTIVE" | "AVAILABLE" | "DONE" | "UPCOMING";
+export type Challenge = {
+  id: string;
+  title: string;
+  description: string;
+  icon: string; // nume Ionicons
+  startsAt: string;
+  endsAt: string;
+  status: ChallengeStatus;
+  joined: boolean;
+  day: number;
+  total: number;
+};
